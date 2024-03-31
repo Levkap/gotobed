@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reasons to Go to Bed</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 30px;
+        }
+
+        #reasonsContainer, #bedtimeContainer, #countdownContainer {
+            margin-bottom: 20px;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        input[type="time"] {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="reasonsContainer">
+        <h1>Why You Should Go to Bed</h1>
+        <p id="reason">...</p>
+        <button id="newReason">Give me another reason</button>
+    </div>
+
+    <div id="bedtimeContainer">
+        <h2>When's Bedtime?</h2>
+        <input type="time" id="bedtime">
+        <button id="startCountdown">Set Bedtime</button>
+    </div>
+
+    <div id="countdownContainer">
+        <p id="countdown">...</p>
+    </div>
+
+    <script>
+        const reasons = [
+            "It helps you grow and repair.",
+            "You'll feel more alert tomorrow.",
+            "It's good for your heart.",
+            "Dreams are cool.",
+            "You'll be in a better mood."
+        ];
+
+        let currentReason = 0;
+        document.getElementById("newReason").onclick = function() {
+            document.getElementById("reason").textContent = reasons[currentReason];
+            currentReason = (currentReason + 1) % reasons.length; // Loop back to the first reason after the last
+        };
+
+        document.getElementById("startCountdown").onclick = function() {
+            const time = document.getElementById("bedtime").value;
+            if (time) {
+                const [hours, minutes] = time.split(":").map(num => parseInt(num, 10));
+                const now = new Date();
+                const bedtime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+
+                if (bedtime < now) { // If bedtime has already passed for today, set for tomorrow
+                    bedtime.setDate(bedtime.getDate() + 1);
+                }
+
+                const updateCountdown = () => {
+                    const diff = bedtime - new Date();
+                    if (diff < 0) {
+                        clearInterval(interval);
+                        document.getElementById("countdown").textContent = "Bedtime has arrived!";
+                        return;
+                    }
+
+                    const hoursLeft = Math.floor(diff / (1000 * 60 * 60));
+                    const minutesLeft = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const secondsLeft = Math.floor((diff % (1000 * 60)) / 1000);
+
+                    document.getElementById("countdown").textContent = `Time until bedtime: ${hoursLeft}h ${minutesLeft}m ${secondsLeft}s`;
+                };
+
+                updateCountdown(); // Run once immediately to avoid delay
+                const interval = setInterval(updateCountdown, 1000);
+            }
+        };
+
+        // Initialize with a reason
+        document.getElementById("reason").textContent = reasons[currentReason];
+        currentReason = (currentReason + 1) % reasons.length;
+    </script>
+</body>
+</html>
